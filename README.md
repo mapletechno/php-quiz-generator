@@ -13,6 +13,46 @@ The app uses its own syntax for creating those types of quizzes:
 The app is written in PHP. And it uses MySQL for persistent data storages.
 
 
+Syntax
+------
+
+In general, express your quiz ths way:
+
+```
+- This is a sample problem.
+  Choose one of the selection below you think is correct.
+
+@ This one is not correct.
+@ This one might be correct.
+* This one is correct.
+
+
+- This is another sample problem.
+  Choose the selections below you think are correct.
+
+  (Note that there might be more than one correct selections.)
+
+# This one is not correct.
+# This one might be correct.
+* This one is correct.
+* This one is correct, too.
+
+
+- Now I have a number in my heart.
+  You may guess it's ___/[ ]*7[ ]*/___.
+
+
+- Please input your text answer below:
+
+[ /Regular expression for correct answer/ ]
+
+
+- Please enter your code:
+
+{ Name of test suites for the code }
+```
+
+
 About the Author
 ----------------
 
