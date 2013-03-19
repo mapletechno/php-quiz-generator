@@ -19,35 +19,35 @@ Syntax
 In general, express your quiz ths way:
 
 ```
-- This is a sample problem.
-  Choose one of the selection below you think is correct.
-
-@ This one is not correct.
-@ This one might be correct.
-* This one is correct.
+Deadline: 2013-04-01
+Hard deadline: 2013-05-01
 
 
-- This is another sample problem.
-  Choose the selections below you think are correct.
++1 This is a sample problem.
+   Choose one of the selection below you think is correct.
 
-  (Note that there might be more than one correct selections.)
-
-# This one is not correct.
-# This one might be correct.
-* This one is correct.
-* This one is correct, too.
+@@ This one is not correct.
+@@ This one might be correct.
+@* This one is correct.
 
 
-- Now I have a number in my heart.
-  You may guess it's ___/[ ]*7[ ]*/___.
++1 This is another sample problem.
+   Choose the selections below you think are correct.
+
+   (Note that there might be more than one correct selections.)
+
+## This one is not correct.
+## This one might be correct.
+#* This one is correct.
+#* This one is correct, too.
 
 
-- Please input your text answer below:
++1 Please input your text answer below:
 
 [ /Regular expression for correct answer/ ]
 
 
-- Please enter your code:
++1 Please enter your code:
 
 { Name of test suites for the code }
 ```
