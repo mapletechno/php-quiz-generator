@@ -10,7 +10,7 @@ The app uses its own syntax for creating those types of quizzes:
 * Blank filling problems
 * Programming problems
 
-The app is written in PHP. And it uses MySQL for persistent data storages.
+The app is written in PHP. And it uses file system for persistent data storages.
 
 
 Syntax
