@@ -10,6 +10,26 @@ function trim_str_array($str_array) {
   return $result;
 }
 
+function string_to_url($string) {
+  $result = trim(strtolower($string));
+  $result = preg_replace('/[ ]+/', '-', $result);
+  return $result;
+}
+
+$small_cases = array(
+  'a', 'in', 'the', 'with', 'out', 'an', 'on', 'of', 'off', 'under', 'above'
+);
+
+function url_to_string($url) {
+  $result = preg_replace('/-+/', ' ', $url);
+  $result = ucwords($result);
+  global $small_cases;
+  foreach ($small_cases as $word) {
+    $result = preg_replace('/\b'.ucfirst($word).'\b/', $word, $result);
+  }
+  return $result;
+}
+
 function parse_problems($quizzes) {
   $result = array();
   foreach ($quizzes as $quiz) {
@@ -34,9 +54,12 @@ function parse_problems($quizzes) {
     }
     $obj['type'] = $type;
     $desc = trim($t[0]);
+    $credit = substr($desc, 0, 1);
+    $desc = substr($desc, 1, strlen($desc) - 1);
     $desc = preg_replace('/(\r\n|\r|\n)/', '<br/>', $desc);
     $desc = '<p>' . preg_replace('/\s*\<br\/\>\s*\<br\/\>\s*/', '</p><p>', $desc) . '</p>';
     $obj['description'] = preg_replace('/\s*\<br\/\>\s*/', ' ', $desc);
+    $obj['credit'] = $credit;
     unset($obj['choices']);
     if (strcmp($type, 'single') == 0 || strcmp($type, 'multiple') == 0) {
       $obj['choices'] = array();
@@ -113,21 +136,86 @@ function dump_quiz($id) {
   $cases_dir = $quiz_full . '/testcases';
   $submit_dir = $quiz_full . '/submissions';
   $quiz = parse_quiz($specs);
+  global $title;
+  $title_split = explode(' ', $title);
+  $quiz_order = $title_split[0];
+  $quiz_title = substr($title, strlen($quiz_order));
 ?>
-  <h1><?php echo $id ?></h1>
+  <h1><span class="quiz-order"><?php echo $quiz_order ?> - </span> <?php echo $quiz_title ?></h1>
   <p>
     The deadline for this assignment is <?php echo $quiz['meta']['deadline'] ?>.
     The hard deadline for this assignment is <?php echo $quiz['meta']['hard_deadline'] ?>.
   </p>
+  <form class="quiz-form" id="<?php echo $id ?>-form" method="post" action="<?php echo $_SERVER['SCRIPT_NAME'] ?>">
+    <script>var editor = null;</script>
+    <?php
+      for ($i = 0; $i < count($quiz['quizzes']); ++$i):
+        $q = $quiz['quizzes'][$i];
+        $number = $i + 1;
+    ?>
+      <h2>
+        Problem <?php echo $number ?>
+        <span class="credit"> - <?php echo $q['credit'] ?> Credit(s)</span>
+      </h2>
+      <?php echo $q['description'] ?>
+      <?php if ($q['type'] == 'single'): ?>
+        <ul>
+          <?php for ($j = 0; $j < count($q['choices']); ++$j): ?>
+            <?php $choice = $q['choices'][$j] ?>
+            <li>
+              <label for="problem-<?php echo $i ?>-choice-<?php echo $j ?>">
+                <input
+                  type="radio"
+                  value="<?php echo $j ?>"
+                  name="problem-<?php echo $i ?>"
+                  id="problem-<?php echo $i ?>-choice-<?php echo $j ?>"
+                />
+                <?php echo trim(substr($choice, 1, strlen($choice) - 1)) ?>
+              </label>
+            </li>
+          <?php endfor // each choice ?>
+        </ul>
+      <?php elseif ($q['type'] == 'multiple'): ?>
+        <ul>
+          <?php for ($j = 0; $j < count($q['choices']); ++$j): ?>
+            <?php $choice = $q['choices'][$j] ?>
+            <li>
+              <label for="problem-<?php echo $i ?>-choice-<?php echo $j ?>">
+                <input
+                  type="checkbox"
+                  value="true"
+                  id="problem-<?php echo $i ?>-choice-<?php echo $j ?>"
+                  name="problem-<?php echo $i ?>-choice-<?php echo $j ?>"
+                />
+                <?php echo trim(substr($choice, 1, strlen($choice) - 1)) ?>
+              </label>
+            </li>
+          <?php endfor // each choice ?>
+        </ul>
+      <?php elseif ($q['type'] == 'text'): ?>
+        <textarea
+          class="text-editor"
+          id="problem-<?php echo $i ?>"
+          name="problem-<?php echo $i ?>"
+        ></textarea>
+      <?php elseif ($q['type'] == 'code'): ?>
+        <div
+          class="code-editor"
+          id="problem-<?php echo $i ?>"
+        ></div>
+        <script>
+          editor = ace.edit("problem-<?php echo $i ?>");
+          editor.setHighlightActiveLine(false);
+          editor.getSession().setMode('ace/mode/c_cpp');
+        </script>
+      <?php endif // if quiz type ?>
+    <?php endfor ?>
+    <div class="form-tail">
+      <input type="hidden" name="action" value="submit" />
+      <input type="hidden" name="quiz-id" value="<?php echo $id ?>" />
+      <input type="submit" class="button submit" value="Submit" />
+      <input type="button" class="button" onclick="window.history.back()" value="Cancel" />
+    </div>
+  </form>
 <?php
-  for ($i = 0; $i < count($quiz['quizzes']); ++$i) {
-    $q = $quiz['quizzes'][$i];
-    $number = $i + 1;
-?>
-    <h2>Problem <?php echo $number ?></h2>
-    <?php echo $q['description'] ?>
-<?php
-  }
-?>
-<?php
-}
+} // function dump_quiz
